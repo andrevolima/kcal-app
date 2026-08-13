@@ -11,7 +11,8 @@ Leia, nesta ordem:
 3. `docs/DATABASE.md`
 4. `docs/SECURITY.md`
 5. `docs/API.md`
-6. Documentação específica da feature, quando existir.
+6. `docs/DESIGN_SYSTEM.md`, para qualquer alteração de interface.
+7. Documentação específica da feature, quando existir.
 
 Não implemente uma decisão importante que contradiga esses documentos. Se houver conflito ou uma decisão arquitetural relevante não estiver documentada, pare e apresente o problema antes de escolher uma solução.
 

@@ -11,6 +11,7 @@ Projeto com API Django e frontend React/Vite.
 - [API](docs/API.md)
 - [Desenvolvimento](docs/DEVELOPMENT.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Design System](docs/DESIGN_SYSTEM.md)
 - [Decisões arquiteturais](docs/decisions/README.md)
 
 ## Backend
