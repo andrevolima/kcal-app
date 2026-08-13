@@ -30,12 +30,15 @@ npm run dev
 cd backend
 python manage.py check
 python manage.py test
+ruff check .
 
 cd ..\frontend
+npm run lint
+npm run typecheck
 npm run build
 ```
 
-Lint, formatação e type checking devem ser definidos junto da migração do frontend para TypeScript e da configuração de qualidade do backend.
+O backend usa Ruff para lint. O frontend usa ESLint e TypeScript em modo estrito.
 
 ## Migrations e commits
 

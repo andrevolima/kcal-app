@@ -21,15 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # the directory from which manage.py is executed.
 load_dotenv(BASE_DIR / '.env')
 
+ENVIRONMENT = getenv('DJANGO_ENVIRONMENT', 'development').lower()
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = getenv(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-change-this-key-before-production',
-)
+SECRET_KEY = getenv('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if ENVIRONMENT != 'development':
+        raise RuntimeError('DJANGO_SECRET_KEY is required outside development.')
+    SECRET_KEY = 'django-insecure-development-only-key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DJANGO_DEBUG', 'True').lower() in {'1', 'true', 'yes'}
@@ -52,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'apps.accounts',
 ]
 
 MIDDLEWARE = [
@@ -144,7 +148,52 @@ CORS_ALLOWED_ORIGINS = [
     if origin.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
+SESSION_COOKIE_SECURE = getenv(
+    'SESSION_COOKIE_SECURE', str(ENVIRONMENT != 'development')
+).lower() in {'1', 'true', 'yes'}
+CSRF_COOKIE_SECURE = getenv(
+    'CSRF_COOKIE_SECURE', str(ENVIRONMENT != 'development')
+).lower() in {'1', 'true', 'yes'}
+SECURE_SSL_REDIRECT = getenv(
+    'SECURE_SSL_REDIRECT', str(ENVIRONMENT != 'development')
+).lower() in {'1', 'true', 'yes'}
+SECURE_HSTS_SECONDS = int(
+    getenv('SECURE_HSTS_SECONDS', '0' if ENVIRONMENT == 'development' else '31536000')
+)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = getenv(
+    'SECURE_HSTS_INCLUDE_SUBDOMAINS', str(ENVIRONMENT != 'development')
+).lower() in {'1', 'true', 'yes'}
+SECURE_HSTS_PRELOAD = getenv(
+    'SECURE_HSTS_PRELOAD', str(ENVIRONMENT != 'development')
+).lower() in {'1', 'true', 'yes'}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': getenv('THROTTLE_RATE_ANONYMOUS', '100/hour'),
+        'user': getenv('THROTTLE_RATE_AUTHENTICATED', '1000/hour'),
+        'auth_login': getenv('THROTTLE_RATE_AUTH_LOGIN', '5/minute'),
+        'token_refresh': getenv('THROTTLE_RATE_TOKEN_REFRESH', '10/minute'),
+        'sensitive': getenv('THROTTLE_RATE_SENSITIVE', '10/minute'),
+    },
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'accounts.User'

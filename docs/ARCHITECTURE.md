@@ -74,7 +74,7 @@ frontend/src/
 └── types/
 ```
 
-> Estado atual: o frontend é uma base React em JavaScript. A adoção de TypeScript deve ocorrer antes do desenvolvimento das features.
+> Estado atual: a base React utiliza TypeScript em modo estrito. Features futuras devem seguir a organização acima quando houver responsabilidade concreta.
 
 ## Escalabilidade
 

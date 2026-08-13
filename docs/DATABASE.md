@@ -12,7 +12,19 @@
 
 ## Entidades existentes
 
-Ainda não existem entidades de negócio. Apenas as tabelas internas do Django estão previstas na configuração inicial.
+### `accounts.User`
+
+Identidade comum baseada em `AbstractUser`, persistida em `accounts_user`.
+
+- PK: `BigAutoField`.
+- Identificador de login: `email`, obrigatório e normalizado em minúsculas. A constraint funcional `accounts_user_email_ci_unique` garante unicidade case-insensitive no PostgreSQL.
+- `username`: removido.
+- `role`: obrigatório e limitado pela aplicação a `nutritionist` ou `athlete`.
+- Credenciais: somente o campo de hash padrão do Django; nunca senha em texto.
+- Estado e administração: `is_active`, `is_staff` e `is_superuser` do Django.
+- Auditoria básica: `created_at` e `updated_at`.
+
+Perfis `Nutritionist` e `Athlete` e o vínculo entre eles ainda não existem. Serão introduzidos somente quando possuírem dados e comportamento próprios.
 
 ## Modelo conceitual inicial
 
@@ -35,3 +47,4 @@ Este diagrama é conceitual e não autoriza a criação antecipada de todas as t
 ## Histórico
 
 - 2026-08-12: documento inicial; modelo de dados detalhado permanece pendente por feature.
+- 2026-08-12: criado o Custom User inicial com login por e-mail e papel.

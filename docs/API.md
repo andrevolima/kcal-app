@@ -26,7 +26,9 @@ Não exponha stack traces ou dados internos ao cliente.
 
 ## Autenticação
 
-O mecanismo ainda não foi decidido. Ele deve ser documentado em ADR antes da implementação.
+JWT foi definido no ADR 0001. Os endpoints de login, refresh, logout e usuário atual pertencem à Etapa 1B e ainda não existem. Endpoints DRF exigem autenticação por padrão; exceções públicas devem ser explícitas.
+
+As rotas futuras ficarão sob `/api/v1/auth/`. Tokens e credenciais nunca devem aparecer em logs ou respostas além do necessário para o protocolo aprovado.
 
 ## Endpoint existente
 
