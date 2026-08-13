@@ -63,6 +63,42 @@ Privado. Requer access válido. Retorna somente `id`, `email` e `role`. Sem aute
 - `403`: CSRF ou autorização recusada.
 - `429`: limite excedido; a resposta inclui `Retry-After` quando disponível.
 
+## Carteira de atletas
+
+Todos os endpoints exigem JWT e permanecem sob o throttle autenticado global. Recursos de outra carteira não aparecem no queryset do nutricionista e retornam `404`.
+
+### `POST /api/v1/athletes/`
+
+Exclusivo para nutricionistas. Cria `User` e `Athlete` atomicamente na carteira do usuário autenticado.
+
+```json
+{
+  "email": "athlete@example.com",
+  "first_name": "Nome",
+  "last_name": "Sobrenome"
+}
+```
+
+Retorna `201`. `nutritionist`, `role` e privilégios são derivados no backend. O usuário recebe senha inutilizável; convite e definição inicial de senha pertencem à Etapa 2B.
+
+### `GET /api/v1/athletes/`
+
+Exclusivo para nutricionistas. Retorna coleção paginada contendo somente a própria carteira, com 20 itens por página por padrão.
+
+### `GET /api/v1/athletes/{id}/`
+
+O nutricionista acessa apenas atletas sob sua responsabilidade. Um usuário Athlete pode acessar somente o perfil associado à própria identidade.
+
+### `PATCH /api/v1/athletes/{id}/`
+
+Exclusivo para o nutricionista responsável. Aceita somente `first_name` e `last_name`. E-mail exige um futuro fluxo de reverificação e não pode ser alterado aqui.
+
+### `POST /api/v1/athletes/{id}/deactivate/`
+
+Exclusivo para o nutricionista responsável. Define `Athlete.is_active=false`, preserva o registro e não altera `User.is_active`. Retorna `200` com o recurso atualizado.
+
+Não existe endpoint `DELETE` para atletas.
+
 ## Endpoint existente
 
 `GET /api/health/` é um endpoint técnico temporário de saúde criado na fundação do projeto. Resposta esperada:

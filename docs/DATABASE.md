@@ -24,7 +24,19 @@ Identidade comum baseada em `AbstractUser`, persistida em `accounts_user`.
 - Estado e administração: `is_active`, `is_staff` e `is_superuser` do Django.
 - Auditoria básica: `created_at` e `updated_at`.
 
-Perfis `Nutritionist` e `Athlete` e o vínculo entre eles ainda não existem. Serão introduzidos somente quando possuírem dados e comportamento próprios.
+Não existe `NutritionistProfile`: o usuário com papel `nutritionist` representa o responsável enquanto não houver dados próprios desse domínio.
+
+### `athletes.Athlete`
+
+Representa o acompanhamento de um usuário atleta por um nutricionista:
+
+- `user`: relação one-to-one com `accounts.User`; o usuário deve possuir papel `athlete`.
+- `nutritionist`: foreign key para `accounts.User`; o responsável deve possuir papel `nutritionist`.
+- `is_active`: estado do acompanhamento na carteira, independente de `User.is_active`.
+- `created_at` e `updated_at`: auditoria básica.
+- `athlete_user_differs_from_nutritionist`: impede que usuário e responsável sejam a mesma identidade.
+
+E-mail, nome e sobrenome permanecem em `accounts.User` e não são duplicados. A foreign key de `nutritionist` fornece o índice usado para filtrar a carteira. Atletas criados nesta etapa recebem senha inutilizável até o futuro fluxo seguro de convite.
 
 ### Blacklist JWT
 
@@ -53,3 +65,4 @@ Este diagrama é conceitual e não autoriza a criação antecipada de todas as t
 - 2026-08-12: documento inicial; modelo de dados detalhado permanece pendente por feature.
 - 2026-08-12: criado o Custom User inicial com login por e-mail e papel.
 - 2026-08-12: adicionadas as migrations oficiais da blacklist JWT.
+- 2026-08-12: criado `athletes.Athlete` e o relacionamento explícito de carteira.

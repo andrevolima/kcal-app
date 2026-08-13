@@ -4,7 +4,8 @@ As etapas indicam ordem conceitual, não datas prometidas.
 
 - [ ] **Foundation:** ambientes, qualidade, CI, TypeScript e convenções.
 - [ ] **Accounts:** autenticação, perfis e autorização.
-- [ ] **Athletes:** carteira, cadastro e convite.
+- [x] **Athletes — Etapa 2A:** carteira, cadastro mínimo, ownership e desativação.
+- [ ] **Athletes — Etapa 2B:** convite seguro de uso único, expiração, definição inicial de senha, ativação e integração com login JWT.
 - [ ] **Nutrition:** planos estruturados e versionamento.
 - [ ] **Adherence:** execução das refeições e observações.
 - [ ] **Training:** registro manual de treinos.

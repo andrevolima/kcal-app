@@ -21,6 +21,12 @@ Login, refresh e logout exigem token CSRF porque estabelecem ou usam credenciais
 
 O backend nega acesso por padrão nos endpoints DRF. Cada endpoint público deverá declarar essa condição explicitamente. Papéis e ownership sempre serão validados no servidor.
 
+## Ownership da carteira
+
+A carteira aplica três camadas: queryset filtrado no PostgreSQL, permission de papel e permission de objeto. Nutricionistas consultam `Athlete.objects.filter(nutritionist=request.user)`; atletas consultam somente `Athlete.objects.filter(user=request.user)`. IDs enviados pelo frontend nunca definem ownership. Tentativas cross-tenant retornam `404` para evitar confirmar a existência do recurso.
+
+A criação deriva o nutricionista e o papel do atleta no backend. Campos administrativos e credenciais não são aceitos. Desativar um acompanhamento não bloqueia automaticamente a conta: `Athlete.is_active` e `User.is_active` são controles distintos.
+
 ## Rate limiting
 
 O DRF aplica limites configuráveis por ambiente: anônimo `100/hora`, autenticado `1000/hora`, login `5/minuto`, refresh `10/minuto` e operações sensíveis `10/minuto`, por padrão. Essa camada reduz abuso comum, mas não substitui proteção de borda contra brute force ou negação de serviço. Consulte o ADR 0002.

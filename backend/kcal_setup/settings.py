@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'apps.accounts',
+    'apps.athletes',
 ]
 
 MIDDLEWARE = [
@@ -203,6 +204,8 @@ REST_FRAMEWORK = {
         'token_refresh': getenv('THROTTLE_RATE_TOKEN_REFRESH', '10/minute'),
         'sensitive': getenv('THROTTLE_RATE_SENSITIVE', '10/minute'),
     },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
 }
 
 SIMPLE_JWT = {
