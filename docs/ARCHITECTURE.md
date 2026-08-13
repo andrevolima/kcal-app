@@ -76,6 +76,8 @@ frontend/src/
 
 > Estado atual: a base React utiliza TypeScript em modo estrito. Features futuras devem seguir a organização acima quando houver responsabilidade concreta.
 
+A autenticação fica em `features/auth`; o cliente HTTP central fica em `api`. O access JWT permanece em memória e uma única operação de refresh é compartilhada entre requisições concorrentes. React Router oferece a proteção de UX, enquanto o DRF continua responsável pela segurança real.
+
 ## Escalabilidade
 
 O backend deve permanecer stateless sempre que possível. Arquivos persistentes futuros devem usar armazenamento apropriado, não o filesystem local da instância. A arquitetura deve permitir múltiplas instâncias da API usando o mesmo PostgreSQL e serviços compartilhados. Microserviços não fazem parte da arquitetura inicial.

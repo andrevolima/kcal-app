@@ -15,13 +15,15 @@ Secrets ficam em variáveis de ambiente e nunca são versionados. Use `.env.exam
 
 ## Autenticação
 
-A estratégia aprovada é JWT. A Etapa 1B usará access token curto em memória e refresh token em cookie `HttpOnly`, com rotação, blacklist e revogação no logout. A chave JWT será independente da `DJANGO_SECRET_KEY`. Consulte o ADR 0001.
+A estratégia aprovada é JWT. O access token dura 5 minutos por padrão e permanece somente em memória. O refresh dura 7 dias por padrão e fica exclusivamente em cookie `HttpOnly`, restrito a `/api/v1/auth/`, com `Secure` em produção e `SameSite=Lax` por padrão. Refresh tokens são rotacionados e o anterior entra na blacklist; logout revoga o token atual. A chave JWT é independente da `DJANGO_SECRET_KEY`. Consulte o ADR 0001.
+
+Login, refresh e logout exigem token CSRF porque estabelecem ou usam credenciais em cookie. CORS aceita credenciais apenas para origens explicitamente configuradas. O frontend não usa `localStorage` nem `sessionStorage` para tokens.
 
 O backend nega acesso por padrão nos endpoints DRF. Cada endpoint público deverá declarar essa condição explicitamente. Papéis e ownership sempre serão validados no servidor.
 
 ## Rate limiting
 
-O DRF aplica limites globais para usuários anônimos e autenticados. Login, refresh e operações sensíveis terão escopos mais restritivos quando forem implementados. Os limites são configuráveis por ambiente. Essa camada reduz abuso comum, mas não substitui proteção de borda contra brute force ou negação de serviço. Consulte o ADR 0002.
+O DRF aplica limites configuráveis por ambiente: anônimo `100/hora`, autenticado `1000/hora`, login `5/minuto`, refresh `10/minuto` e operações sensíveis `10/minuto`, por padrão. Essa camada reduz abuso comum, mas não substitui proteção de borda contra brute force ou negação de serviço. Consulte o ADR 0002.
 
 ## IA
 

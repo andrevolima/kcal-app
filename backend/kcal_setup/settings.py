@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 from os import getenv
 from pathlib import Path
+from datetime import timedelta
 
 from dotenv import load_dotenv
 
@@ -34,6 +35,12 @@ if not SECRET_KEY:
         raise RuntimeError('DJANGO_SECRET_KEY is required outside development.')
     SECRET_KEY = 'django-insecure-development-only-key'
 
+JWT_SIGNING_KEY = getenv('JWT_SIGNING_KEY')
+if not JWT_SIGNING_KEY:
+    if ENVIRONMENT != 'development':
+        raise RuntimeError('JWT_SIGNING_KEY is required outside development.')
+    JWT_SIGNING_KEY = 'jwt-development-only-key-separate-from-django'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DJANGO_DEBUG', 'True').lower() in {'1', 'true', 'yes'}
 
@@ -55,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'apps.accounts',
 ]
 
@@ -147,6 +155,7 @@ CORS_ALLOWED_ORIGINS = [
     ).split(',')
     if origin.strip()
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
@@ -160,6 +169,7 @@ SESSION_COOKIE_SECURE = getenv(
 CSRF_COOKIE_SECURE = getenv(
     'CSRF_COOKIE_SECURE', str(ENVIRONMENT != 'development')
 ).lower() in {'1', 'true', 'yes'}
+CSRF_COOKIE_SAMESITE = getenv('CSRF_COOKIE_SAMESITE', 'Lax')
 SECURE_SSL_REDIRECT = getenv(
     'SECURE_SSL_REDIRECT', str(ENVIRONMENT != 'development')
 ).lower() in {'1', 'true', 'yes'}
@@ -174,6 +184,10 @@ SECURE_HSTS_PRELOAD = getenv(
 ).lower() in {'1', 'true', 'yes'}
 
 REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'apps.accounts.api.exceptions.api_exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
@@ -190,6 +204,28 @@ REST_FRAMEWORK = {
         'sensitive': getenv('THROTTLE_RATE_SENSITIVE', '10/minute'),
     },
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(
+        minutes=int(getenv('JWT_ACCESS_MINUTES', '5'))
+    ),
+    'REFRESH_TOKEN_LIFETIME': timedelta(
+        days=int(getenv('JWT_REFRESH_DAYS', '7'))
+    ),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': JWT_SIGNING_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+JWT_REFRESH_COOKIE_NAME = getenv('JWT_REFRESH_COOKIE_NAME', 'ppn_refresh')
+JWT_REFRESH_COOKIE_SECURE = getenv(
+    'JWT_REFRESH_COOKIE_SECURE', str(ENVIRONMENT != 'development')
+).lower() in {'1', 'true', 'yes'}
+JWT_REFRESH_COOKIE_SAMESITE = getenv('JWT_REFRESH_COOKIE_SAMESITE', 'Lax')
+JWT_REFRESH_COOKIE_PATH = '/api/v1/auth/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

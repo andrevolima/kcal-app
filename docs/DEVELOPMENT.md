@@ -35,6 +35,7 @@ ruff check .
 cd ..\frontend
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
 

@@ -26,6 +26,10 @@ Identidade comum baseada em `AbstractUser`, persistida em `accounts_user`.
 
 Perfis `Nutritionist` e `Athlete` e o vínculo entre eles ainda não existem. Serão introduzidos somente quando possuírem dados e comportamento próprios.
 
+### Blacklist JWT
+
+As tabelas fornecidas por `rest_framework_simplejwt.token_blacklist` registram refresh tokens emitidos e revogados. Elas suportam rotação, bloqueio de reutilização e logout efetivo; não armazenam senhas.
+
 ## Modelo conceitual inicial
 
 ```mermaid
@@ -48,3 +52,4 @@ Este diagrama é conceitual e não autoriza a criação antecipada de todas as t
 
 - 2026-08-12: documento inicial; modelo de dados detalhado permanece pendente por feature.
 - 2026-08-12: criado o Custom User inicial com login por e-mail e papel.
+- 2026-08-12: adicionadas as migrations oficiais da blacklist JWT.
