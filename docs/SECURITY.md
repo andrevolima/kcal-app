@@ -27,9 +27,17 @@ A carteira aplica três camadas: queryset filtrado no PostgreSQL, permission de 
 
 A criação deriva o nutricionista e o papel do atleta no backend. Campos administrativos e credenciais não são aceitos. Desativar um acompanhamento não bloqueia automaticamente a conta: `Athlete.is_active` e `User.is_active` são controles distintos.
 
+## Convites de primeiro acesso
+
+Convites usam tokens gerados por CSPRNG com 256 bits de entropia. O banco armazena somente SHA-256; o token bruto é uma credencial bearer presente apenas no link. Convites expiram em 48 horas por padrão, são de uso único e são consumidos junto com `set_password` em transação. Uma nova emissão revoga convites anteriores.
+
+Links podem ser retornados pela API somente em ambiente de desenvolvimento com `ATHLETE_INVITATION_EXPOSE_LINK=True`; a aplicação recusa essa configuração fora de desenvolvimento. Tokens, links completos e senhas não devem aparecer em logs. Validação e ativação públicas retornam dados mínimos e possuem throttles próprios. Convite inicial não pode ser reutilizado como recuperação de senha.
+
 ## Rate limiting
 
 O DRF aplica limites configuráveis por ambiente: anônimo `100/hora`, autenticado `1000/hora`, login `5/minuto`, refresh `10/minuto` e operações sensíveis `10/minuto`, por padrão. Essa camada reduz abuso comum, mas não substitui proteção de borda contra brute force ou negação de serviço. Consulte o ADR 0002.
+
+Convites adicionam: emissão `5/hora`, validação `20/minuto` e ativação `5/minuto`.
 
 ## IA
 

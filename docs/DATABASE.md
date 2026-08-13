@@ -42,6 +42,17 @@ E-mail, nome e sobrenome permanecem em `accounts.User` e não são duplicados. A
 
 As tabelas fornecidas por `rest_framework_simplejwt.token_blacklist` registram refresh tokens emitidos e revogados. Elas suportam rotação, bloqueio de reutilização e logout efetivo; não armazenam senhas.
 
+### `athletes.AthleteInvitation`
+
+Convite de primeiro acesso ligado a um `Athlete`:
+
+- `token_hash`: SHA-256 único do token; o token bruto nunca é persistido.
+- `created_at` e `expires_at`: emissão e expiração.
+- `used_at`: preenchido após definição bem-sucedida da primeira senha.
+- `revoked_at`: preenchido quando o convite é substituído ou revogado.
+
+O estado é derivado desses timestamps: válido, expirado, utilizado ou revogado. Um novo convite revoga convites anteriores ainda abertos. O convite não substitui recuperação de senha.
+
 ## Modelo conceitual inicial
 
 ```mermaid
@@ -66,3 +77,4 @@ Este diagrama é conceitual e não autoriza a criação antecipada de todas as t
 - 2026-08-12: criado o Custom User inicial com login por e-mail e papel.
 - 2026-08-12: adicionadas as migrations oficiais da blacklist JWT.
 - 2026-08-12: criado `athletes.Athlete` e o relacionamento explícito de carteira.
+- 2026-08-12: criado `AthleteInvitation` para onboarding de uso único.

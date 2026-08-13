@@ -1,9 +1,8 @@
 from django.conf import settings
-from django.middleware.csrf import CsrfViewMiddleware, get_token
+from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
@@ -16,14 +15,7 @@ from apps.accounts.services import (
 )
 
 from .serializers import CurrentUserSerializer, LoginSerializer
-
-
-def _enforce_csrf(request):
-    check = CsrfViewMiddleware(lambda _request: None)
-    check.process_request(request)
-    reason = check.process_view(request, None, (), {})
-    if reason:
-        raise PermissionDenied('CSRF validation failed.')
+from .csrf import enforce_csrf
 
 
 def _set_refresh_cookie(response, refresh_token):
@@ -60,7 +52,7 @@ class LoginView(APIView):
     throttle_scope = 'auth_login'
 
     def post(self, request):
-        _enforce_csrf(request)
+        enforce_csrf(request)
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, access, refresh = create_token_pair(**serializer.validated_data)
@@ -81,7 +73,7 @@ class RefreshView(APIView):
     throttle_scope = 'token_refresh'
 
     def post(self, request):
-        _enforce_csrf(request)
+        enforce_csrf(request)
         refresh = request.COOKIES.get(settings.JWT_REFRESH_COOKIE_NAME)
         if not refresh:
             return Response(
@@ -101,7 +93,7 @@ class LogoutView(APIView):
     throttle_scope = 'sensitive'
 
     def post(self, request):
-        _enforce_csrf(request)
+        enforce_csrf(request)
         refresh = request.COOKIES.get(settings.JWT_REFRESH_COOKIE_NAME)
         if refresh:
             revoke_refresh_token(refresh_token=refresh)

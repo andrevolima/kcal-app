@@ -2,7 +2,9 @@ from .models import Athlete
 
 
 def get_accessible_athletes(*, user):
-    queryset = Athlete.objects.select_related('user', 'nutritionist')
+    queryset = Athlete.objects.select_related('user', 'nutritionist').prefetch_related(
+        'invitations'
+    )
     if user.role == user.Role.NUTRITIONIST:
         return queryset.filter(nutritionist=user)
     if user.role == user.Role.ATHLETE:

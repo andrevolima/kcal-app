@@ -24,6 +24,16 @@ load_dotenv(BASE_DIR / '.env')
 
 ENVIRONMENT = getenv('DJANGO_ENVIRONMENT', 'development').lower()
 
+FRONTEND_URL = getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+ATHLETE_INVITATION_EXPIRY_HOURS = int(
+    getenv('ATHLETE_INVITATION_EXPIRY_HOURS', '48')
+)
+ATHLETE_INVITATION_EXPOSE_LINK = getenv(
+    'ATHLETE_INVITATION_EXPOSE_LINK', str(ENVIRONMENT == 'development')
+).lower() in {'1', 'true', 'yes'}
+if ENVIRONMENT != 'development' and ATHLETE_INVITATION_EXPOSE_LINK:
+    raise RuntimeError('Invitation links cannot be exposed outside development.')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -203,6 +213,15 @@ REST_FRAMEWORK = {
         'auth_login': getenv('THROTTLE_RATE_AUTH_LOGIN', '5/minute'),
         'token_refresh': getenv('THROTTLE_RATE_TOKEN_REFRESH', '10/minute'),
         'sensitive': getenv('THROTTLE_RATE_SENSITIVE', '10/minute'),
+        'athlete_invitation_issue': getenv(
+            'THROTTLE_RATE_INVITATION_ISSUE', '5/hour'
+        ),
+        'athlete_invitation_validate': getenv(
+            'THROTTLE_RATE_INVITATION_VALIDATE', '20/minute'
+        ),
+        'athlete_invitation_activate': getenv(
+            'THROTTLE_RATE_INVITATION_ACTIVATE', '5/minute'
+        ),
     },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,

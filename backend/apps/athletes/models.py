@@ -41,3 +41,22 @@ class Athlete(models.Model):
             errors['nutritionist'] = 'The responsible user must have the nutritionist role.'
         if errors:
             raise ValidationError(errors)
+
+
+class AthleteInvitation(models.Model):
+    athlete = models.ForeignKey(
+        Athlete,
+        on_delete=models.CASCADE,
+        related_name='invitations',
+    )
+    token_hash = models.CharField(max_length=64, unique=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'Invitation {self.pk} for athlete {self.athlete_id}'

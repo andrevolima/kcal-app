@@ -99,6 +99,31 @@ Exclusivo para o nutricionista responsável. Define `Athlete.is_active=false`, p
 
 Não existe endpoint `DELETE` para atletas.
 
+## Convite e primeiro acesso
+
+### `POST /api/v1/athletes/{id}/invite/`
+
+Exclusivo para o nutricionista responsável e limitado a `5/hour`. Emite um convite com validade padrão de 48 horas e revoga convites anteriores ainda abertos. Atletas inativos ou que já possuem senha utilizável não podem receber convite de primeiro acesso.
+
+Retorna `201` com `status` e `expires_at`. Somente em desenvolvimento, quando explicitamente habilitado, inclui `invitation_url`; produção nunca retorna o token bruto.
+
+### `GET /api/v1/auth/invitations/{token}/`
+
+Público e limitado a `20/minute` por IP. Retorna somente validade e expiração, ou um motivo mínimo entre `invalid`, `expired`, `used` e `revoked`. Não retorna dados do atleta.
+
+### `POST /api/v1/auth/invitations/{token}/activate/`
+
+Público, protegido por CSRF e limitado a `5/minute` por IP.
+
+```json
+{
+  "password": "new password",
+  "password_confirm": "new password"
+}
+```
+
+Valida a senha com os validators oficiais do Django, define o hash com `set_password` e consome o convite atomicamente. Retorna `{ "activated": true }`. Não realiza login automático; o atleta usa o login JWT normal depois da ativação.
+
 ## Endpoint existente
 
 `GET /api/health/` é um endpoint técnico temporário de saúde criado na fundação do projeto. Resposta esperada:
