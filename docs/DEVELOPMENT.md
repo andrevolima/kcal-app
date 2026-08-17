@@ -24,6 +24,23 @@ npm install
 npm run dev
 ```
 
+### Criando um nutricionista de desenvolvimento
+
+Com o ambiente virtual do backend ativo:
+
+```powershell
+python manage.py create_nutritionist `
+  --email nutritionist@example.com `
+  --first-name Nome `
+  --last-name Sobrenome
+```
+
+O comando solicita a senha e a confirmação interativamente, sem eco no terminal, e aplica os validators de senha do Django. Ele cria um usuário normal com papel `nutritionist`, sem acesso ao Django Admin.
+
+> Este comando é um mecanismo administrativo/de desenvolvimento. Ele não define o futuro fluxo público de cadastro de nutricionistas.
+
+Para um superuser do Django Admin, continue usando `python manage.py createsuperuser`.
+
 ## Verificações
 
 ```powershell

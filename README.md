@@ -26,6 +26,8 @@ python manage.py runserver
 A API fica disponível em `http://127.0.0.1:8000`. O endpoint de teste é
 `GET /api/health/`.
 
+Para provisionar o primeiro nutricionista, consulte [Desenvolvimento](docs/DEVELOPMENT.md#criando-um-nutricionista-de-desenvolvimento).
+
 ## Frontend
 
 Em outro terminal:
